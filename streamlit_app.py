@@ -1,13 +1,16 @@
 # streamlit_app.py
 import streamlit as st
+import cv2
+import numpy as np
+from PIL import Image
 import pandas as pd
 import plotly.express as px
-from PIL import Image
-import io
-import json
+import matplotlib.pyplot as plt
+from ultralytics import YOLO
 import os
-from GarbageDetector import GarbageDetector
-from config import test_config, MODEL_CONFIG
+import json
+from .GarbageDetector import GarbageDetector
+from .config import test_config, MODEL_CONFIG
 
 def main():
     st.set_page_config(
@@ -532,7 +535,7 @@ def main():
             df_class_perf = pd.DataFrame(class_performance)
             st.dataframe(
                 df_class_perf,
-                use_container_width=True,
+                width='stretch',
                 hide_index=True,
                 column_config={
                     "类别": st.column_config.TextColumn(width="medium"),
