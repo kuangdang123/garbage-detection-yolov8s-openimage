@@ -1,18 +1,21 @@
 # 最简单的部署代码
 from ultralytics import YOLO
 import cv2
+import os
 import numpy as np
-from PIL import Image
+from PIL import Image, ImageDraw, ImageFont
 import matplotlib.pyplot as plt
 GARBAGE_CLASSIFICATION = {
     # 可回收物
     "Bottle": {
+        "name" : "瓶子",
         "category": "可回收物",
         "color": (0, 255, 0),  # 绿色
-        "advice": "请清空内容物，压扁后投入可回收物垃圾桶",
+        "advice": "请清空内容物，可以压扁后投入可回收物垃圾桶",
         "icon": "♻️"
     },
     "Book": {
+        "name": "书本",
         "category": "可回收物", 
         "color": (0, 255, 0),
         "advice": "保持干燥整洁，投入可回收物垃圾桶",
@@ -21,6 +24,7 @@ GARBAGE_CLASSIFICATION = {
     
     # 有害垃圾
     "Mobile phone": {
+        "name": "手机",
         "category": "有害垃圾",
         "color": (255, 0, 0),  # 红色
         "advice": "含有重金属，请投入有害垃圾回收箱或专门回收点",
@@ -29,18 +33,21 @@ GARBAGE_CLASSIFICATION = {
     
     # 厨余垃圾  
     "Banana": {
+        "name": "香蕉",
         "category": "厨余垃圾",
         "color": (255, 165, 0),  # 橙色
         "advice": "请投入厨余垃圾桶，可用于堆肥",
         "icon": "🍌"
     },
     "Apple": {
+        "name": "苹果",
         "category": "厨余垃圾",
         "color": (255, 165, 0),
         "advice": "果核可降解，请投入厨余垃圾桶",
         "icon": "🍎"
     },
     "Orange": {
+        "name": "橙子",
         "category": "厨余垃圾", 
         "color": (255, 165, 0),
         "advice": "果皮易腐烂，请投入厨余垃圾桶",
@@ -49,18 +56,21 @@ GARBAGE_CLASSIFICATION = {
     
     # 其他垃圾
     "Plastic bag": {
+        "name": "塑料袋",
         "category": "其他垃圾",
         "color": (128, 128, 128),  # 灰色
         "advice": "污染的塑料袋属于其他垃圾，请投入其他垃圾桶",
         "icon": "🛍️"
     },
     "Toilet paper": {
+        "name": "厕纸",
         "category": "其他垃圾",
         "color": (128, 128, 128),
         "advice": "使用过的卫生纸属于其他垃圾，请投入其他垃圾桶", 
         "icon": "🧻"
     },
     "Coffee cup": {
+        "name": "咖啡杯",
         "category": "其他垃圾",
         "color": (128, 128, 128),
         "advice": "一次性咖啡杯通常属于其他垃圾，请投入其他垃圾桶",
@@ -78,14 +88,14 @@ class GarbageDetector:
             "其他垃圾": (128, 128, 128)   # 灰色
         }
 
-    def detect(self, image_input):
+    def detect(self, image_input, confidence_threshold):
         """
         检测垃圾
         image_input: 可以是文件路径、PIL图像、numpy数组等
         """
         # 完全不需要手动预处理！
-        results = self.model(image_input)
-        return self._parse_results(results)
+        results = self.model(image_input, conf=confidence_threshold)
+        return self._parse_results(results, image_input)
     
     def _parse_results(self, results, original_image):
         """
@@ -114,6 +124,7 @@ class GarbageDetector:
                 
                 # 获取垃圾分类信息
                 garbage_info = GARBAGE_CLASSIFICATION.get(class_name, {
+                    "name": "未知物品",
                     "category": "未知分类",
                     "color": (0, 0, 255),  # 蓝色
                     "advice": "请查询当地垃圾分类标准",
@@ -122,7 +133,7 @@ class GarbageDetector:
                 
                 detection = {
                     'id': i,
-                    'class': class_name,
+                    'class': garbage_info['name'],
                     'confidence': confidence,
                     'bbox': bbox,
                     'category': garbage_info['category'],
@@ -149,7 +160,35 @@ class GarbageDetector:
         image: 原始图像
         detections: 检测结果
         """
-        img_copy = image.copy()
+        # 将OpenCV图像转换为PIL图像以便绘制中文
+        if isinstance(image, np.ndarray):
+            img_pil = Image.fromarray(image)
+        else:
+            img_pil = image.copy()
+        
+        draw = ImageDraw.Draw(img_pil)
+        
+        # 尝试加载中文字体
+        try:
+            # 尝试几种常见的中文字体
+            font_paths = [
+                '/System/Library/Fonts/PingFang.ttc',  # macOS
+                '/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf',  # Linux
+                'C:/Windows/Fonts/simhei.ttf',  # Windows
+                'C:/Windows/Fonts/msyh.ttc',    # Windows
+            ]
+            font = None
+            for font_path in font_paths:
+                if os.path.exists(font_path):
+                    try:
+                        font = ImageFont.truetype(font_path, 20)
+                        break
+                    except:
+                        continue
+            if font is None:
+                font = ImageFont.load_default()
+        except:
+            font = ImageFont.load_default()
         
         for detection in detections:
             x1, y1, x2, y2 = map(int, detection['bbox'])
@@ -157,21 +196,39 @@ class GarbageDetector:
             category = detection['category']
             class_name = detection['class']
             confidence = detection['confidence']
+            icon = detection['icon']
             
             # 绘制边界框
-            cv2.rectangle(img_copy, (x1, y1), (x2, y2), color, 3)
+            draw.rectangle([x1, y1, x2, y2], outline=color, width=3)
             
-            # 绘制类别标签背景
-            label = f"{detection['icon']} {class_name} {category} {confidence:.2f}"
-            label_size = cv2.getTextSize(label, cv2.FONT_HERSHEY_SIMPLEX, 0.6, 2)[0]
-            cv2.rectangle(img_copy, (x1, y1 - label_size[1] - 10), 
-                         (x1 + label_size[0], y1), color, -1)
+            # 准备标签文本（使用图标和中文）
+            label_text = f"{class_name} {category} {confidence:.2f}"
+            
+            # 计算文本大小
+            try:
+                bbox = draw.textbbox((0, 0), label_text, font=font)
+                text_width = bbox[2] - bbox[0]
+                text_height = bbox[3] - bbox[1]
+            except:
+                text_width = len(label_text) * 10
+                text_height = 20
+            
+            # 绘制标签背景
+            draw.rectangle([x1, y1 - text_height - 10, x1 + text_width + 10, y1], 
+                        fill=color)
             
             # 绘制文本
-            cv2.putText(img_copy, label, (x1, y1 - 5), 
-                       cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 255, 255), 2)
+            try:
+                draw.text((x1 + 5, y1 - text_height - 5), label_text, 
+                        fill=(255, 255, 255), font=font)
+            except:
+                # 如果中文绘制失败，回退到英文
+                label_text_en = f"{icon} {class_name} {confidence:.2f}"
+                draw.text((x1 + 5, y1 - text_height - 5), label_text_en, 
+                        fill=(255, 255, 255), font=font)
         
-        return img_copy
+        # 转换回numpy数组
+        return np.array(img_pil)
     
     def _get_category_statistics(self, detections):
         """

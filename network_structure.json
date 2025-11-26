@@ -1,0 +1,261 @@
+[
+    {
+        "from": "-1",
+        "n": 1,
+        "params": 928,
+        "module": "ultralytics.nn.modules.conv.Conv",
+        "arguments": [
+            3,
+            32,
+            3,
+            2
+        ]
+    },
+    {
+        "from": "-1",
+        "n": 1,
+        "params": 18560,
+        "module": "ultralytics.nn.modules.conv.Conv",
+        "arguments": [
+            32,
+            64,
+            3,
+            2
+        ]
+    },
+    {
+        "from": "-1",
+        "n": 1,
+        "params": 29056,
+        "module": "ultralytics.nn.modules.block.C2f",
+        "arguments": [
+            64,
+            64,
+            1,
+            true
+        ]
+    },
+    {
+        "from": "-1",
+        "n": 1,
+        "params": 73984,
+        "module": "ultralytics.nn.modules.conv.Conv",
+        "arguments": [
+            64,
+            128,
+            3,
+            2
+        ]
+    },
+    {
+        "from": "-1",
+        "n": 2,
+        "params": 197632,
+        "module": "ultralytics.nn.modules.block.C2f",
+        "arguments": [
+            128,
+            128,
+            2,
+            true
+        ]
+    },
+    {
+        "from": "-1",
+        "n": 1,
+        "params": 295424,
+        "module": "ultralytics.nn.modules.conv.Conv",
+        "arguments": [
+            128,
+            256,
+            3,
+            2
+        ]
+    },
+    {
+        "from": "-1",
+        "n": 2,
+        "params": 788480,
+        "module": "ultralytics.nn.modules.block.C2f",
+        "arguments": [
+            256,
+            256,
+            2,
+            true
+        ]
+    },
+    {
+        "from": "-1",
+        "n": 1,
+        "params": 1180672,
+        "module": "ultralytics.nn.modules.conv.Conv",
+        "arguments": [
+            256,
+            512,
+            3,
+            2
+        ]
+    },
+    {
+        "from": "-1",
+        "n": 1,
+        "params": 1838080,
+        "module": "ultralytics.nn.modules.block.C2f",
+        "arguments": [
+            512,
+            512,
+            1,
+            true
+        ]
+    },
+    {
+        "from": "-1",
+        "n": 1,
+        "params": 656896,
+        "module": "ultralytics.nn.modules.block.SPPF",
+        "arguments": [
+            512,
+            512,
+            5
+        ]
+    },
+    {
+        "from": "-1",
+        "n": 1,
+        "params": 0,
+        "module": "torch.nn.modules.upsampling.Upsample",
+        "arguments": [
+            null,
+            2,
+            "nearest"
+        ]
+    },
+    {
+        "from": "[-1, 6]",
+        "n": 1,
+        "params": 0,
+        "module": "ultralytics.nn.modules.conv.Concat",
+        "arguments": [
+            1
+        ]
+    },
+    {
+        "from": "-1",
+        "n": 1,
+        "params": 591360,
+        "module": "ultralytics.nn.modules.block.C2f",
+        "arguments": [
+            768,
+            256,
+            1
+        ]
+    },
+    {
+        "from": "-1",
+        "n": 1,
+        "params": 0,
+        "module": "torch.nn.modules.upsampling.Upsample",
+        "arguments": [
+            null,
+            2,
+            "nearest"
+        ]
+    },
+    {
+        "from": "[-1, 4]",
+        "n": 1,
+        "params": 0,
+        "module": "ultralytics.nn.modules.conv.Concat",
+        "arguments": [
+            1
+        ]
+    },
+    {
+        "from": "-1",
+        "n": 1,
+        "params": 148224,
+        "module": "ultralytics.nn.modules.block.C2f",
+        "arguments": [
+            384,
+            128,
+            1
+        ]
+    },
+    {
+        "from": "-1",
+        "n": 1,
+        "params": 147712,
+        "module": "ultralytics.nn.modules.conv.Conv",
+        "arguments": [
+            128,
+            128,
+            3,
+            2
+        ]
+    },
+    {
+        "from": "[-1, 12]",
+        "n": 1,
+        "params": 0,
+        "module": "ultralytics.nn.modules.conv.Concat",
+        "arguments": [
+            1
+        ]
+    },
+    {
+        "from": "-1",
+        "n": 1,
+        "params": 493056,
+        "module": "ultralytics.nn.modules.block.C2f",
+        "arguments": [
+            384,
+            256,
+            1
+        ]
+    },
+    {
+        "from": "-1",
+        "n": 1,
+        "params": 590336,
+        "module": "ultralytics.nn.modules.conv.Conv",
+        "arguments": [
+            256,
+            256,
+            3,
+            2
+        ]
+    },
+    {
+        "from": "[-1, 9]",
+        "n": 1,
+        "params": 0,
+        "module": "ultralytics.nn.modules.conv.Concat",
+        "arguments": [
+            1
+        ]
+    },
+    {
+        "from": "-1",
+        "n": 1,
+        "params": 1969152,
+        "module": "ultralytics.nn.modules.block.C2f",
+        "arguments": [
+            768,
+            512,
+            1
+        ]
+    },
+    {
+        "from": "[15, 18, 21]",
+        "n": 1,
+        "params": 2119531,
+        "module": "ultralytics.nn.modules.head.Detect",
+        "arguments": [
+            9,
+            [
+                128,
+                256,
+                512
+            ]
+        ]
+    }
+]
