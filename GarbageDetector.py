@@ -5,78 +5,7 @@ import os
 import numpy as np
 from PIL import Image, ImageDraw, ImageFont
 import matplotlib.pyplot as plt
-GARBAGE_CLASSIFICATION = {
-    # 可回收物
-    "Bottle": {
-        "name" : "瓶子",
-        "category": "可回收物",
-        "color": (0, 255, 0),  # 绿色
-        "advice": "请清空内容物，可以压扁后投入可回收物垃圾桶",
-        "icon": "♻️"
-    },
-    "Book": {
-        "name": "书本",
-        "category": "可回收物", 
-        "color": (0, 255, 0),
-        "advice": "保持干燥整洁，投入可回收物垃圾桶",
-        "icon": "♻️"
-    },
-    
-    # 有害垃圾
-    "Mobile phone": {
-        "name": "手机",
-        "category": "有害垃圾",
-        "color": (255, 0, 0),  # 红色
-        "advice": "含有重金属，请投入有害垃圾回收箱或专门回收点",
-        "icon": "☣️"
-    },
-    
-    # 厨余垃圾  
-    "Banana": {
-        "name": "香蕉",
-        "category": "厨余垃圾",
-        "color": (255, 165, 0),  # 橙色
-        "advice": "请投入厨余垃圾桶，可用于堆肥",
-        "icon": "🍌"
-    },
-    "Apple": {
-        "name": "苹果",
-        "category": "厨余垃圾",
-        "color": (255, 165, 0),
-        "advice": "果核可降解，请投入厨余垃圾桶",
-        "icon": "🍎"
-    },
-    "Orange": {
-        "name": "橙子",
-        "category": "厨余垃圾", 
-        "color": (255, 165, 0),
-        "advice": "果皮易腐烂，请投入厨余垃圾桶",
-        "icon": "🍊"
-    },
-    
-    # 其他垃圾
-    "Plastic bag": {
-        "name": "塑料袋",
-        "category": "其他垃圾",
-        "color": (128, 128, 128),  # 灰色
-        "advice": "污染的塑料袋属于其他垃圾，请投入其他垃圾桶",
-        "icon": "🛍️"
-    },
-    "Toilet paper": {
-        "name": "厕纸",
-        "category": "其他垃圾",
-        "color": (128, 128, 128),
-        "advice": "使用过的卫生纸属于其他垃圾，请投入其他垃圾桶", 
-        "icon": "🧻"
-    },
-    "Coffee cup": {
-        "name": "咖啡杯",
-        "category": "其他垃圾",
-        "color": (128, 128, 128),
-        "advice": "一次性咖啡杯通常属于其他垃圾，请投入其他垃圾桶",
-        "icon": "☕"
-    }
-}
+from config import GARBAGE_CLASSIFICATION
 
 class GarbageDetector:
     def __init__(self, model_path):
@@ -88,7 +17,7 @@ class GarbageDetector:
             "其他垃圾": (128, 128, 128)   # 灰色
         }
 
-    def detect(self, image_input, confidence_threshold):
+    def detect(self, image_input, confidence_threshold=0.5):
         """
         检测垃圾
         image_input: 可以是文件路径、PIL图像、numpy数组等
@@ -172,10 +101,10 @@ class GarbageDetector:
         try:
             # 尝试几种常见的中文字体
             font_paths = [
-                '/System/Library/Fonts/PingFang.ttc',  # macOS
-                '/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf',  # Linux
                 'C:/Windows/Fonts/simhei.ttf',  # Windows
                 'C:/Windows/Fonts/msyh.ttc',    # Windows
+                '/System/Library/Fonts/PingFang.ttc',  # macOS
+                '/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf',  # Linux
             ]
             font = None
             for font_path in font_paths:

@@ -6,11 +6,10 @@ from PIL import Image
 import pandas as pd
 import plotly.express as px
 import matplotlib.pyplot as plt
-from ultralytics import YOLO
 import os
 import json
-from .GarbageDetector import GarbageDetector
-from .config import test_config, MODEL_CONFIG
+from GarbageDetector import GarbageDetector
+from config import test_config, MODEL_CONFIG
 
 def main():
     st.set_page_config(
@@ -101,6 +100,7 @@ def main():
     
     # ==================== 检测结果显示 ====================
     if image_input is not None:
+        results = None
         col1, col2 = st.columns(2)
         
         with col1:
@@ -125,62 +125,65 @@ def main():
                     
                     # 显示检测结果图像
                     st.image(results['annotated_image'], width='stretch')
-                    
-                    # 显示统计信息
-                    st.subheader("📊 检测统计")
-                    
-                    # 创建统计图表
-                    stats_data = []
-                    for category, info in results['category_stats'].items():
-                        if info['count'] > 0:
-                            stats_data.append({
-                                '垃圾分类': category,
-                                '数量': info['count'],
-                                '颜色': detector.category_colors.get(category, (0,0,0))
-                            })
-                    
-                    if stats_data:
-                        # 饼图
-                        fig = px.pie(
-                            stats_data, 
-                            values='数量', 
-                            names='垃圾分类',
-                            title='垃圾分类分布',
-                            color='垃圾分类',
-                            color_discrete_map={
-                                '可回收物': 'green',
-                                '有害垃圾': 'red', 
-                                '厨余垃圾': 'orange',
-                                '其他垃圾': 'gray'
-                            }
-                        )
-                        st.plotly_chart(fig, width='stretch')
-                        st.metric("总检测数量", results['total_count'])
-                    else:
-                        st.warning("未检测到符合条件的垃圾物品")
-                    
-                    # 详细检测结果表格
-                    st.subheader("📋 检测详情")
-                    
-                    if results['detections']:
-                        # 创建结果表格
-                        df_data = []
-                        for detection in results['detections']:
-                            df_data.append({
-                                '物品名称': f"{detection['icon']} {detection['class']}",
-                                '垃圾类别': detection['category'],
-                                '置信度': f"{detection['confidence']:.3f}",
-                                '处理建议': detection['advice']
-                            })
-                        
-                        df = pd.DataFrame(df_data)
-                        st.dataframe(df, width='stretch')
-                    else:
-                        st.warning("未检测到符合条件的垃圾物品")
             
             else:
                 st.info("点击'开始检测'按钮进行分析")
-    
+        if results is not None:
+            col3, col4 = st.columns(2)
+            with col3:
+                # 显示统计信息
+                st.subheader("📊 检测统计")
+                
+                # 创建统计图表
+                stats_data = []
+                for category, info in results['category_stats'].items():
+                    if info['count'] > 0:
+                        stats_data.append({
+                            '垃圾分类': category,
+                            '数量': info['count'],
+                            '颜色': detector.category_colors.get(category, (0,0,0))
+                        })
+                
+                if stats_data:
+                    # 饼图
+                    fig = px.pie(
+                        stats_data, 
+                        values='数量', 
+                        names='垃圾分类',
+                        title='垃圾分类分布',
+                        color='垃圾分类',
+                        color_discrete_map={
+                            '可回收物': 'green',
+                            '有害垃圾': 'red', 
+                            '厨余垃圾': 'orange',
+                            '其他垃圾': 'gray'
+                        }
+                    )
+                    st.plotly_chart(fig, width='stretch')
+                    st.metric("总检测数量", results['total_count'])
+                else:
+                    st.warning("未检测到符合条件的垃圾物品")
+                        
+            with col4:
+                # 详细检测结果表格
+                st.subheader("📋 检测详情")
+                
+                if results['detections']:
+                    # 创建结果表格
+                    df_data = []
+                    for detection in results['detections']:
+                        df_data.append({
+                            '物品名称': f"{detection['icon']} {detection['class']}",
+                            '垃圾类别': detection['category'],
+                            '置信度': f"{detection['confidence']:.3f}",
+                            '处理建议': detection['advice']
+                        })
+                    
+                    df = pd.DataFrame(df_data)
+                    st.dataframe(df, width='stretch')
+                else:
+                    st.warning("未检测到符合条件的垃圾物品")
+
     # ==================== 模型信息展示 ====================
     st.header("🔬 模型信息")
     
