@@ -11,6 +11,9 @@ import json
 from GarbageDetector import GarbageDetector
 from config import test_config, MODEL_CONFIG
 
+# 命令行启动（请提前转换到pytorch环境）：
+# streamlit run d:\Desktop\工程实训\streamlit_app.py
+
 def main():
     st.set_page_config(
         page_title="智能垃圾分类检测系统",

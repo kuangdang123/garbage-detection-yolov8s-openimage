@@ -32,6 +32,9 @@ residual = ["Plastic bag", "Toilet paper", "Coffee cup"]
 ### streamlit_app.py
 app界面定义脚本，负责了前后端的交互
 
+### BatchGarbageTester.py
+批量图片测试类，提供大量测试方法
+
 
 ## 未来可能支持的部分
 
